@@ -1,0 +1,22 @@
+/* 全站共用：色票、尺寸單位、reset、版面模式 */
+
+:root{
+  --cream:#efe4cb; --red:#e5402a; --yellow:#f3c33c;
+  --u:calc(var(--safe-w, 100vw) / 100);          /* 安全框寬度的 1%（--safe-w 由 useLayout 寫入） */
+  --nav-x:clamp(16px, 2.6vw, 46px);
+}
+html.phone{--nav-x:calc(var(--u) * 5.5)}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#030304;overflow:hidden;color:var(--cream);
+  font-family:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;-webkit-font-smoothing:antialiased}
+
+/* 版面模式（class 掛在 <html> 上）
+   side  ：桌機寬螢幕，本店紹介收在左側抽屜
+   stack ：窄螢幕，本店紹介排在第一屏下方，頁面可捲動
+   phone ：比海報比例更窄，以整個螢幕為構圖框 */
+html.stack,html.stack body{overflow-x:hidden;overflow-y:auto}
+html.menu-open,html.menu-open body{overflow:hidden}
+
+/* 多個元件共用的進場動畫 */
+@keyframes fade{from{opacity:0;transform:translateX(-1.5cqw)}to{opacity:1;transform:none}}

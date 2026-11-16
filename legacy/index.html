@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>おもちゃ屋01 — 月面ドライブ・ログ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,700;1,700&family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@500;900&display=swap" rel="stylesheet">
+<style>
+:root{ --cream:#efe4cb; --red:#e5402a; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#030304;overflow:hidden;color:var(--cream);
+  font-family:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP",sans-serif;-webkit-font-smoothing:antialiased}
+
+/* 場景鋪滿整個視窗；743:1005 是構圖的「安全框」，寬螢幕時左右自然延伸 */
+#stage{position:relative;height:100vh;height:100svh;overflow:hidden;background:#07080b}
+html.stack,html.stack body{overflow-x:hidden;overflow-y:auto}
+html.menu-open,html.menu-open body{overflow:hidden}
+#safe{position:absolute;left:50%;top:50%;width:min(100vw, calc(100vh * 743 / 1005));aspect-ratio:743/1005;
+  transform:translate(-50%,-50%);container-type:size;pointer-events:none}
+html.phone #safe{width:100vw;height:100%;aspect-ratio:auto;left:0;top:0;transform:none}
+html.phone .head{padding:calc(15.2cqw + env(safe-area-inset-top)) 5.5cqw 0}
+html.phone .year{font-size:2.6cqw}
+html.phone .title{font-size:10.6cqw}
+html.phone .sub{font-size:5.4cqw}
+html.phone .tag{font-size:3.3cqw}
+html.phone .credit{font-size:8px;bottom:calc(6px + env(safe-area-inset-bottom))}
+.credit{position:absolute;right:12px;bottom:8px;font:500 9px/1 "Chakra Petch",sans-serif;letter-spacing:.06em;opacity:.35;color:var(--cream)}
+.credit a{color:inherit}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+#gl.drag{cursor:grabbing}
+
+.head{position:absolute;left:0;right:0;top:0;padding:13.1cqw 5cqw 0;pointer-events:none;will-change:transform}
+#topnav{position:fixed;left:0;right:0;top:0;z-index:7;pointer-events:none;
+  padding:calc(var(--u) * 4.2 + env(safe-area-inset-top)) var(--nav-x) calc(var(--u) * 1.2);transition:background .35s ease}
+#topnav.scrolled{background:linear-gradient(#0a0b0e 72%, rgba(10,11,14,0))}
+:root{--nav-x:clamp(16px, 2.6vw, 46px)}
+html.phone{--nav-x:calc(var(--u) * 5.5)}
+html.phone #topnav{padding-top:calc(var(--u) * 5.5 + env(safe-area-inset-top))}
+.bar{display:flex;justify-content:space-between;align-items:flex-end}
+.logo{font:italic 700 calc(var(--u) * 3.1)/1 "Chakra Petch",sans-serif;border:calc(var(--u) * .3) solid var(--cream);padding:calc(var(--u) * .6) calc(var(--u) * 1.8) calc(var(--u) * .9);transform:skewX(-12deg)}
+.logo b{color:var(--red)}
+.issue{font:italic 700 calc(var(--u) * 7.6)/.78 "Chakra Petch",sans-serif;color:transparent;-webkit-text-stroke:calc(var(--u) * .3) var(--cream)}
+html.phone .logo{font-size:calc(var(--u) * 3.8)}
+html.phone .issue{font-size:calc(var(--u) * 8.6)}
+.rule{margin-top:calc(var(--u) * 1.5);height:calc(var(--u) * 1.5);position:relative}
+.rule i{position:absolute;left:0;right:0;background:var(--cream)}
+.rule i:nth-child(1){top:0;height:max(calc(var(--u) * .45),2px);clip-path:polygon(0 0,64% 0,63.6% 100%,0 100%)}
+.rule i:nth-child(2){top:0;height:max(calc(var(--u) * .45),2px);clip-path:polygon(64.4% 0,100% 0,100% 100%,64% 100%)}
+.rule i:nth-child(3){bottom:0;height:max(calc(var(--u) * .22),1px)}
+.title-wrap{display:flex;align-items:center;gap:1.4cqw;margin-top:.8cqw}
+.year{font:700 1.7cqw "Chakra Petch",sans-serif;letter-spacing:.08em}
+.title{font-family:"Dela Gothic One","Zen Kaku Gothic New",sans-serif;font-weight:400;color:var(--red);
+  font-size:11.4cqw;line-height:1.02;letter-spacing:-.03em;transform:skewX(-9deg);transform-origin:left bottom;white-space:nowrap}
+.title span{display:inline-block;animation:drop .8s cubic-bezier(.2,.9,.25,1.25) both;animation-delay:calc(var(--i)*70ms + .2s)}
+.title em{font-style:italic;font-family:"Chakra Petch",sans-serif;font-weight:700;letter-spacing:-.06em;margin-left:.04em}
+@keyframes drop{from{opacity:0;transform:translateY(-.35em) scaleY(1.3)}to{opacity:1;transform:none}}
+.sub{text-shadow:0 .3cqw 1.2cqw rgba(0,0,0,.75);font-weight:900;font-size:4.5cqw;letter-spacing:.04em;margin-top:.5cqw;animation:fade 1s .8s both}
+.tag{text-shadow:0 .2cqw .9cqw rgba(0,0,0,.85);font-weight:500;font-size:2.3cqw;letter-spacing:.14em;margin-top:1.1cqw;opacity:.92;animation:fade 1s 1s both}
+@keyframes fade{from{opacity:0;transform:translateX(-1.5cqw)}to{opacity:1;transform:none}}
+
+/* ================= 漢堡選單 ================= */
+:root{ --yellow:#f3c33c; --u:calc(var(--safe-w, 100vw) / 100); }
+#safe{z-index:6}
+#gl{touch-action:none}
+html.stack #gl{touch-action:pan-y}
+.brand{display:flex;align-items:center;gap:calc(var(--u) * 2.4)}
+/* 線框漢堡：三條空心長條，不加底色 */
+.menu-btn{pointer-events:auto;position:relative;width:calc(var(--u) * 5.6);height:calc(var(--u) * 4.2);min-width:30px;min-height:23px;
+  background:none;border:0;padding:0;cursor:pointer;color:var(--yellow);transform:skewX(-12deg);-webkit-tap-highlight-color:transparent}
+.menu-btn::before{content:"";position:absolute;inset:-12px}                 /* 擴大可點範圍 */
+.menu-btn i{position:absolute;left:0;height:max(calc(var(--u) * .95),6px);border:max(calc(var(--u) * .24),1.5px) solid currentColor;background:transparent;
+  transition:top .45s cubic-bezier(.7,0,.2,1),transform .45s cubic-bezier(.7,0,.2,1),width .35s ease,opacity .25s}
+.menu-btn i:nth-child(1){top:0;width:100%}
+.menu-btn i:nth-child(2){top:calc(50% - max(calc(var(--u) * .475),3px));width:62%}
+.menu-btn i:nth-child(3){top:calc(100% - max(calc(var(--u) * .95),6px));width:84%}
+.menu-btn:hover i:nth-child(2),.menu-btn:focus-visible i:nth-child(2){width:100%}
+.menu-btn:hover i:nth-child(3),.menu-btn:focus-visible i:nth-child(3){width:100%}
+.menu-btn:focus-visible{outline:none}
+.menu-btn:focus-visible::after{content:"";position:absolute;inset:-7px;border:1px dashed var(--yellow)}
+html.menu-open .menu-btn i:nth-child(1){top:calc(50% - max(calc(var(--u) * .475),3px));width:100%;transform:rotate(38deg)}
+html.menu-open .menu-btn i:nth-child(2){opacity:0;transform:translateX(-40%)}
+html.menu-open .menu-btn i:nth-child(3){top:calc(50% - max(calc(var(--u) * .475),3px));width:100%;transform:rotate(-38deg)}
+.hero{transition:opacity .4s ease, transform .5s ease}
+html.menu-open .hero{opacity:0;transform:translateX(-3cqw)}
+#gl{transition:filter .6s ease}
+html.menu-open #gl{filter:brightness(.5) saturate(.65)}
+
+#menu{position:fixed;inset:0;z-index:5;pointer-events:none;visibility:hidden;transition:visibility 0s .7s}
+html.menu-open #menu{pointer-events:auto;visibility:visible;transition:none}
+.m-backdrop{position:absolute;inset:0;opacity:0;transition:opacity .5s ease;
+  background:radial-gradient(rgba(10,11,14,.55) 1.1px, transparent 1.5px) 0 0/5px 5px, rgba(7,8,11,.35)}
+html.menu-open .m-backdrop{opacity:1}
+.m-panel{position:absolute;left:0;top:0;bottom:0;width:clamp(470px, 46vw, 780px);
+  transform:translateX(-104%);transition:transform .7s cubic-bezier(.75,0,.15,1);
+  padding:calc(var(--u) * 19 + env(safe-area-inset-top)) calc(var(--u) * 15) calc(var(--u) * 5 + env(safe-area-inset-bottom)) var(--nav-x);
+  display:flex;flex-direction:column;color:var(--cream)}
+html.menu-open .m-panel{transform:none}
+/* 斜切的紙面：紅色邊條 + 網點紙 */
+.m-panel::before,.m-panel::after{content:"";position:absolute;inset:0;z-index:-1}
+.m-panel::before{background:var(--red);clip-path:polygon(0 0,100% 0,calc(100% - var(--u) * 7) 100%,0 100%)}
+.m-panel::after{background:radial-gradient(rgba(239,228,203,.075) 1px, transparent 1.4px) 0 0/6px 6px, linear-gradient(180deg,#0d0e12,#0a0b0e 60%,#0e0d0c);
+  clip-path:polygon(0 0,calc(100% - var(--u) * 1.4) 0,calc(100% - var(--u) * 8.4) 100%,0 100%)}
+.m-kicker{display:flex;justify-content:space-between;align-items:baseline;font:italic 700 calc(var(--u) * 1.9) "Chakra Petch",sans-serif;letter-spacing:.14em;opacity:.8}
+.m-kicker b{color:var(--yellow);font-weight:700}
+.m-title{font-family:"Dela Gothic One","Zen Kaku Gothic New",sans-serif;font-size:calc(var(--u) * 4.4);margin-top:calc(var(--u) * 1.2);
+  transform:skewX(-9deg);transform-origin:left bottom;letter-spacing:.02em}
+.m-title span{color:var(--red)}
+.m-rule{height:calc(var(--u) * 1.2);position:relative;margin:calc(var(--u) * 1.6) 0 calc(var(--u) * .6)}
+.m-rule::before,.m-rule::after{content:"";position:absolute;left:0;right:0;background:var(--cream)}
+.m-rule::before{top:0;height:max(calc(var(--u) * .4),2px)}
+.m-rule::after{bottom:0;height:1px}
+.m-list{list-style:none;flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.m-list li{border-bottom:1px dashed rgba(239,228,203,.32);opacity:0;transform:translateX(-6%);
+  transition:opacity .45s ease, transform .6s cubic-bezier(.2,.9,.25,1.1)}
+html.menu-open .m-list li{opacity:1;transform:none;transition-delay:calc(.28s + var(--i) * 55ms)}
+.m-list a{display:grid;grid-template-columns:calc(var(--u) * 8.6) auto 1fr auto;align-items:center;gap:calc(var(--u) * 1.6);
+  padding:calc(var(--u) * 2.05) 0;color:inherit;text-decoration:none;position:relative;transition:transform .35s cubic-bezier(.2,.9,.25,1.2)}
+.m-list a::before{content:"";position:absolute;left:calc(var(--u) * -2.2);top:22%;bottom:22%;width:calc(var(--u) * .9);background:var(--red);
+  transform:skewX(-14deg) scaleY(0);transition:transform .3s ease}
+.m-list .n{font:italic 700 calc(var(--u) * 5.2)/.8 "Chakra Petch",sans-serif;color:transparent;-webkit-text-stroke:max(calc(var(--u) * .2),1.2px) var(--cream);transition:color .3s, -webkit-text-stroke-color .3s}
+.m-list .jp{font-family:"Dela Gothic One","Zen Kaku Gothic New",sans-serif;font-size:calc(var(--u) * 6.1);line-height:1.05;white-space:nowrap;
+  transform:skewX(-9deg);transform-origin:left bottom;transition:color .25s, text-shadow .25s}
+.m-list .en{justify-self:end;text-align:right;white-space:nowrap;font:italic 700 calc(var(--u) * 1.75)/1.25 "Chakra Petch",sans-serif;letter-spacing:.12em;opacity:.85}
+.m-list .en small{display:block;font:500 calc(var(--u) * 1.65)/1.4 "Zen Kaku Gothic New",sans-serif;letter-spacing:.06em;opacity:.8;margin-top:.2em}
+.m-list .ar{font:700 calc(var(--u) * 2.6) "Chakra Petch",sans-serif;color:var(--yellow);opacity:0;transform:translateX(-50%);transition:opacity .25s, transform .3s}
+.m-list .tagx{position:absolute;left:calc(var(--u) * 8.6 + var(--u) * 1.6);top:calc(var(--u) * .35);font:900 calc(var(--u) * 1.45)/1 "Zen Kaku Gothic New",sans-serif;
+  color:var(--ink,#0a0b0e);background:var(--yellow);padding:.35em .55em .4em;transform:skewX(-12deg) rotate(-3deg);letter-spacing:.08em}
+.m-list a:hover,.m-list a:focus-visible{transform:translateX(calc(var(--u) * 1.6));outline:none}
+.m-list a:hover::before,.m-list a:focus-visible::before{transform:skewX(-14deg) scaleY(1)}
+.m-list a:hover .jp,.m-list a:focus-visible .jp{color:var(--yellow);text-shadow:.05em .035em 0 rgba(229,64,42,.9)}
+.m-list a:hover .n,.m-list a:focus-visible .n{color:var(--red);-webkit-text-stroke-color:var(--red)}
+.m-list a:hover .ar,.m-list a:focus-visible .ar{opacity:1;transform:none}
+.m-foot{margin-top:calc(var(--u) * 2.4);display:flex;justify-content:space-between;align-items:flex-end;gap:calc(var(--u) * 2);
+  opacity:0;transition:opacity .5s ease}
+html.menu-open .m-foot{opacity:1;transition-delay:.7s}
+.m-links{white-space:nowrap;display:flex;gap:calc(var(--u) * 2.6);font-weight:900;font-size:calc(var(--u) * 2.1)}
+.m-links a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(239,228,203,.4);padding-bottom:2px}
+.m-links a:hover,.m-links a:focus-visible{color:var(--yellow);border-color:var(--yellow);outline:none}
+.m-info{white-space:nowrap;text-align:right;font-size:calc(var(--u) * 1.6);line-height:1.6;opacity:.75;letter-spacing:.06em}
+.m-info em{font:italic 700 1em "Chakra Petch",sans-serif;font-style:italic}
+.m-vert{position:absolute;right:calc(var(--u) * 6.2);top:calc(var(--u) * 21);writing-mode:vertical-rl;font-weight:900;font-size:calc(var(--u) * 1.55);
+  letter-spacing:.55em;opacity:.55;display:flex;gap:1.2em;align-items:center}
+.m-vert::before{content:"";width:1px;height:calc(var(--u) * 9);background:var(--cream)}
+html.phone .m-panel{width:100%;padding-right:calc(var(--u) * 6)}
+html.phone .m-panel::before{display:none}
+html.phone .m-panel::after{clip-path:none}
+html.phone .m-vert{display:none}
+html.phone .m-list .jp{font-size:calc(var(--u) * 7.4)}
+html.phone .m-list .n{font-size:calc(var(--u) * 6)}
+html.phone .m-list a{grid-template-columns:calc(var(--u) * 10) auto 1fr auto;padding:calc(var(--u) * 3) 0}
+html.phone .m-list .tagx{left:calc(var(--u) * 11.6);font-size:calc(var(--u) * 2.3)}
+html.phone .m-list .en{font-size:calc(var(--u) * 2.5)}
+html.phone .m-list .en small{font-size:calc(var(--u) * 2.5)}
+html.phone .m-list .ar{display:none}
+html.phone .m-kicker{font-size:calc(var(--u) * 2.8)}
+html.phone .m-title{font-size:calc(var(--u) * 6)}
+html.phone .m-foot{flex-direction:column;align-items:flex-start}
+html.phone .m-links{font-size:calc(var(--u) * 3.6)}
+html.phone .m-info{text-align:left;font-size:calc(var(--u) * 2.9)}
+html.phone .m-panel{padding-top:calc(var(--u) * 25 + env(safe-area-inset-top))}
+@media (prefers-reduced-motion: reduce){ .m-panel,.m-list li,.menu-btn i{transition-duration:.01s !important} }
+
+/* ================= 本店紹介 ================= */
+#about{position:relative;z-index:4;color:var(--cream);font-size:15px;line-height:1.8}
+.ab-inner{max-width:440px}
+.ab-kicker{display:flex;justify-content:space-between;align-items:baseline;font:italic 700 .78em "Chakra Petch",sans-serif;letter-spacing:.16em;
+  padding-bottom:.7em;border-bottom:1px solid rgba(239,228,203,.55);opacity:.9}
+.ab-kicker span:last-child{font:900 1em "Zen Kaku Gothic New",sans-serif;letter-spacing:.3em;color:var(--yellow)}
+.ab-name{font-family:"Dela Gothic One","Zen Kaku Gothic New",sans-serif;font-weight:400;font-size:2.65em;line-height:1.1;margin-top:.45em;
+  transform:skewX(-9deg);transform-origin:left bottom;letter-spacing:.01em}
+.ab-name b{color:var(--red)}
+.ab-sub{font:italic 700 .8em "Chakra Petch",sans-serif;letter-spacing:.14em;margin-top:.35em;opacity:.85}
+.ab-sub em{color:var(--yellow)}
+.ab-lead{font-weight:900;font-size:1.12em;margin-top:1.1em;letter-spacing:.04em}
+.ab-text p{margin-top:.55em}
+.ab-text p:not(.ab-lead){opacity:.88}
+.ab-points{list-style:none;margin-top:1em;border-top:1px dashed rgba(239,228,203,.35)}
+.ab-points li{display:flex;align-items:center;gap:.8em;padding:.42em 0;border-bottom:1px dashed rgba(239,228,203,.35);font-weight:700}
+.ab-points span{font:italic 700 1.35em/1 "Chakra Petch",sans-serif;color:transparent;-webkit-text-stroke:1.2px var(--yellow);min-width:1.6em}
+/* 米色紙卡（呼應地圖插畫的紙面） */
+.ab-card{margin-top:1.4em;color:#16171b;padding:1em 1.1em 1.1em;border:2px solid #0a0b0e;box-shadow:6px 6px 0 var(--red);
+  background:radial-gradient(rgba(22,23,27,.07) 1px, transparent 1.4px) 0 0/5px 5px, #ece0c4}
+.ab-info{display:grid;grid-template-columns:auto 1fr;gap:.25em .9em;font-size:.88em;line-height:1.6}
+.ab-info dt{font-weight:900;color:#fff;background:var(--red);padding:0 .45em;align-self:start;transform:skewX(-10deg);font-size:.86em;letter-spacing:.12em;margin-top:.15em}
+.ab-info dd{font-weight:700}
+.ab-map{margin-top:.9em}
+.ab-zoom{display:block;position:relative;width:100%;padding:0;border:2px solid #0a0b0e;background:#0a0b0e;cursor:zoom-in;overflow:hidden}
+.ab-zoom img{display:block;width:100%;height:auto;transition:transform .5s cubic-bezier(.2,.9,.25,1)}
+.ab-zoom span{position:absolute;right:.5em;bottom:.5em;font:900 .72em/1 "Zen Kaku Gothic New",sans-serif;letter-spacing:.1em;color:#0a0b0e;background:var(--yellow);
+  padding:.45em .6em;transform:skewX(-10deg);border:1.5px solid #0a0b0e}
+.ab-zoom:hover img,.ab-zoom:focus-visible img{transform:scale(1.04)}
+.ab-zoom:focus-visible{outline:2px dashed var(--red);outline-offset:3px}
+.ab-map figcaption{margin-top:.55em;font-size:.76em;font-weight:700;letter-spacing:.05em}
+.ab-map figcaption b{font:italic 700 1em "Chakra Petch",sans-serif;color:var(--red);margin-right:.5em;letter-spacing:.14em}
+
+/* 桌機寬螢幕：放進安全框左側的留白 */
+html.side #about{position:fixed;left:0;top:0;bottom:0;width:clamp(380px, var(--safe-l), 560px);overflow-y:auto;scrollbar-width:none;
+  padding:calc(var(--u) * 13.1 + 4.2vh) clamp(22px, 2.4vw, 42px) 28px var(--nav-x);font-size:clamp(12px, .86vw, 15px);
+  background:radial-gradient(rgba(239,228,203,.06) 1px, transparent 1.4px) 0 0/6px 6px, linear-gradient(90deg, rgba(6,7,10,.95), rgba(8,9,12,.9));
+  border-right:2px solid var(--cream);box-shadow:6px 0 0 var(--red), 6px 0 40px rgba(0,0,0,.5);
+  transform:translateX(calc(-100% - 10px));visibility:hidden;
+  transition:transform .55s cubic-bezier(.75,0,.15,1), visibility 0s .55s}
+html.side.about-open #about{transform:none;visibility:visible;transition:transform .65s cubic-bezier(.2,.9,.2,1)}
+html.side #about::-webkit-scrollbar{display:none}
+html.side .ab-inner > *{opacity:0;transform:translateX(-14px);transition:opacity .3s ease, transform .3s ease}
+html.side.about-open .ab-inner > *{opacity:1;transform:none;transition:opacity .5s ease, transform .6s cubic-bezier(.2,.9,.25,1.1)}
+html.side.about-open .ab-inner > :nth-child(1){transition-delay:.18s}
+html.side.about-open .ab-inner > :nth-child(2){transition-delay:.24s}
+html.side.about-open .ab-inner > :nth-child(3){transition-delay:.3s}
+html.side.about-open .ab-inner > :nth-child(4){transition-delay:.36s}
+html.side.about-open .ab-inner > :nth-child(5){transition-delay:.44s}
+.ab-close{display:none}
+html.side .ab-kicker span:last-child{visibility:hidden}
+html.side .ab-close{display:flex;align-items:center;gap:.5em;position:absolute;top:calc(var(--u) * 13.1 + 4.2vh - .45em - 8px);right:clamp(22px, 2.4vw, 42px);
+  font:italic 700 .78em/1 "Chakra Petch",sans-serif;letter-spacing:.16em;color:var(--yellow);background:none;border:1.5px solid var(--yellow);
+  padding:.55em .8em;cursor:pointer;transform:skewX(-10deg)}
+html.side .ab-close:hover,html.side .ab-close:focus-visible{background:var(--yellow);color:#0a0b0e;outline:none}
+
+/* ================= 衛星鎖定框（桌機、可 hover 的裝置）================= */
+#lock{position:absolute;left:0;top:0;z-index:3;padding:0;border:0;background:none;cursor:pointer;color:var(--yellow);
+  display:none;will-change:transform;-webkit-tap-highlight-color:transparent;transition:opacity .4s ease}
+html.hoverable #lock{display:block}
+html.menu-open #lock{opacity:0;pointer-events:none}
+#lock .frame{position:absolute;inset:0;animation:breathe 2.6s ease-in-out infinite;transition:transform .35s cubic-bezier(.2,.9,.25,1.3)}
+@keyframes breathe{50%{transform:scale(1.07)}}
+#lock .c{position:absolute;width:15px;height:15px;border:2px solid currentColor;transition:border-color .2s, transform .35s cubic-bezier(.2,.9,.25,1.3)}
+#lock .tl{left:0;top:0;border-right:0;border-bottom:0}
+#lock .tr{right:0;top:0;border-left:0;border-bottom:0}
+#lock .bl{left:0;bottom:0;border-right:0;border-top:0}
+#lock .br{right:0;bottom:0;border-left:0;border-top:0}
+#lock .tk{position:absolute;background:currentColor;opacity:.75}
+#lock .tk.t{left:50%;top:-7px;width:1.5px;height:9px}
+#lock .tk.b{left:50%;bottom:-7px;width:1.5px;height:9px}
+#lock .tk.l{top:50%;left:-7px;height:1.5px;width:9px}
+#lock .tk.r{top:50%;right:-7px;height:1.5px;width:9px}
+#lock .ring{position:absolute;left:50%;top:50%;width:72%;aspect-ratio:1;border:1px dashed currentColor;border-radius:50%;opacity:0;
+  transform:translate(-50%,-50%) scale(1.5);transition:opacity .3s, transform .4s cubic-bezier(.2,.9,.25,1.2)}
+#lock .tag{position:absolute;left:-2px;top:calc(100% + 12px);white-space:nowrap;display:flex;align-items:center;gap:.5em;
+  font:italic 700 11px/1 "Chakra Petch",sans-serif;letter-spacing:.14em;padding:5px 8px;border:1px solid currentColor;
+  background:rgba(7,8,11,.55);transform:skewX(-10deg);transition:background .2s, color .2s}
+#lock .tag b{font:900 11px/1 "Zen Kaku Gothic New",sans-serif;letter-spacing:.12em}
+#lock .tag .on{display:none}
+#lock:hover .frame,#lock:focus-visible .frame{animation:none;transform:scale(.88)}
+#lock:hover .c,#lock:focus-visible .c{border-color:var(--red)}
+#lock:hover .ring,#lock:focus-visible .ring{opacity:.85;animation:spin 7s linear infinite}
+@keyframes spin{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+#lock:hover .tag,#lock:focus-visible .tag{background:var(--yellow);color:#0a0b0e;border-color:var(--yellow)}
+#lock:hover .tag .off,#lock:focus-visible .tag .off{display:none}
+#lock:hover .tag .on,#lock:focus-visible .tag .on{display:inline}
+#lock:focus-visible{outline:none}
+html.about-open #lock .frame{animation:none;transform:scale(.88)}
+html.about-open #lock .c{border-color:var(--red)}
+html.about-open #lock .tag{background:var(--red);color:var(--cream);border-color:var(--red)}
+#tether{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible;opacity:0;transition:opacity .4s ease}
+html.side.about-open #tether{opacity:1;transition:opacity .5s .45s ease}
+#tether path{fill:none;stroke:var(--yellow);stroke-width:1.3;stroke-dasharray:5 5;animation:dash 1.2s linear infinite}
+#tether circle{fill:var(--yellow)}
+@keyframes dash{to{stroke-dashoffset:-20}}
+/* 窄螢幕／手機：變成第一屏下方的 footer */
+html.stack #about{padding:72px 6vw 88px;background:radial-gradient(rgba(239,228,203,.05) 1px, transparent 1.4px) 0 0/6px 6px, #0a0b0e;
+  border-top:3px solid var(--cream);box-shadow:inset 0 5px 0 #0a0b0e, inset 0 6px 0 var(--cream)}
+html.stack .ab-inner{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:1fr 1.05fr;gap:0 52px;align-items:start}
+html.stack .ab-kicker,html.stack .ab-name,html.stack .ab-sub{grid-column:1 / -1}
+html.stack .ab-card{margin-top:1.4em}
+html.phone #about{padding:56px 5.5vw calc(64px + env(safe-area-inset-bottom));font-size:15px}
+html.phone .ab-inner{display:block}
+html.phone .ab-name{font-size:2.4em}
+html:not(.side):not(.stack) #about{display:none}
+.scroll-hint{display:none}
+html.stack .scroll-hint{display:flex;position:absolute;left:50%;bottom:calc(30px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2;
+  flex-direction:column;align-items:center;gap:4px;font:italic 700 10px/1 "Chakra Petch",sans-serif;letter-spacing:.3em;color:var(--cream);opacity:.8;
+  animation:bob 2.2s ease-in-out infinite;pointer-events:none}
+html.menu-open .scroll-hint{opacity:0}
+html.stack .scroll-hint span{font:900 11px/1 "Zen Kaku Gothic New",sans-serif;letter-spacing:.2em;color:var(--yellow)}
+@keyframes bob{50%{transform:translate(-50%,6px)}}
+#lightbox{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:4vmin;cursor:zoom-out;
+  background:radial-gradient(rgba(10,11,14,.6) 1.1px, transparent 1.5px) 0 0/5px 5px, rgba(7,8,11,.88)}
+#lightbox[hidden]{display:none}
+#lightbox img{max-width:100%;max-height:100%;border:3px solid var(--cream);box-shadow:8px 8px 0 var(--red)}
+.lb-close{position:absolute;top:14px;right:18px;width:44px;height:44px;font:700 30px/1 "Chakra Petch",sans-serif;color:var(--yellow);background:none;border:2px solid var(--yellow);cursor:pointer;transform:skewX(-10deg)}
+#veil{z-index:10;position:absolute;inset:0;background:#07080b;pointer-events:none;transition:opacity 1.4s ease}
+#err{position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:24px;font-weight:700}
+</style>
+</head>
+<body>
+<header id="topnav">
+  <div class="bar">
+    <div class="brand">
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="menu"><i></i><i></i><i></i></button>
+      <div class="logo">lunar<b>·</b>drive</div>
+    </div>
+    <div class="issue">002</div>
+  </div>
+  <div class="rule"><i></i><i></i><i></i></div>
+</header>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="safe"><div class="head" id="head">
+    <div class="hero"><div class="title-wrap"><span class="year">2031</span><h1 class="title" id="title">おもちゃ屋<em>01</em></h1></div>
+    <div class="sub">月面ドライブ・ログ</div>
+    <div class="tag">—— 静かの海を、ハイビームで。</div></div>
+  </div></div>
+  <nav id="menu" aria-label="商品カテゴリー" aria-hidden="true">
+    <div class="m-backdrop" data-close></div>
+    <div class="m-panel">
+      <div class="m-kicker"><span>CATEGORY INDEX</span><span>おもちゃ屋 <b>No.002</b></span></div>
+      <div class="m-title">商品カテゴリー<span>.</span></div>
+      <div class="m-rule"></div>
+      <ol class="m-list">
+        <li style="--i:0"><a href="#gunpla"><span class="n">01</span><span class="jp">ガンプラ</span><span class="en">GUNPLA<small>組み立てプラモデル</small></span><span class="ar">→</span><span class="tagx">新入荷</span></a></li>
+        <li style="--i:1"><a href="#sofubi"><span class="n">02</span><span class="jp">ソフビ</span><span class="en">SOFT VINYL<small>塩ビ・ゴム人形</small></span><span class="ar">→</span></a></li>
+        <li style="--i:2"><a href="#carded"><span class="n">03</span><span class="jp">吊るし玩具</span><span class="en">CARDED TOYS<small>台紙付き・吊りカード</small></span><span class="ar">→</span><span class="tagx">昭和レトロ</span></a></li>
+        <li style="--i:3"><a href="#tin"><span class="n">04</span><span class="jp">ブリキ</span><span class="en">TIN TOYS<small>ぜんまい仕掛け</small></span><span class="ar">→</span></a></li>
+        <li style="--i:4"><a href="#capsule"><span class="n">05</span><span class="jp">カプセルトイ</span><span class="en">CAPSULE TOYS<small>回して、当てる。</small></span><span class="ar">→</span></a></li>
+        <li style="--i:5"><a href="#minicar"><span class="n">06</span><span class="jp">ミニカー</span><span class="en">DIE-CAST<small>1/64 コレクション</small></span><span class="ar">→</span></a></li>
+      </ol>
+      <div class="m-foot">
+        <div class="m-links"><a href="#shop">店舗案内</a><a href="#access">アクセス</a><a href="#contact">お問い合わせ</a></div>
+        <div class="m-info">営業 <em>10:00 — 19:00</em> ／ 月曜定休<br>—— 月面から、なつかしいおもちゃを。</div>
+      </div>
+      <div class="m-vert">おもちゃ屋・月面支店</div>
+    </div>
+  </nav>
+  <div class="credit">Earth data: <a href="https://www.solarsystemscope.com/textures/">Solar System Scope</a> (CC BY 4.0)</div>
+  <div id="veil"></div>
+  <div id="err">這個瀏覽器無法啟用 WebGL，3D 場景無法顯示。</div>
+  <svg id="tether" aria-hidden="true"><path d=""/><circle r="3.5" cx="-10" cy="-10"/></svg>
+  <button type="button" id="lock" aria-label="本店紹介を開く" aria-expanded="false" aria-controls="about">
+    <span class="frame"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i><i class="tk t"></i><i class="tk b"></i><i class="tk l"></i><i class="tk r"></i></span>
+    <span class="ring"></span>
+    <span class="tag"><span class="off">TGT-02 ▸ <b>本店紹介</b></span><span class="on">LOCK ON ▸ <b>クリックで開く</b></span></span>
+  </button>
+  <div class="scroll-hint" aria-hidden="true">SCROLL<span>本店紹介 ↓</span></div>
+</div>
+<aside id="about" aria-labelledby="ab-title">
+  <button type="button" class="ab-close" id="abClose" aria-label="本店紹介を閉じる">× CLOSE</button>
+  <div class="ab-inner">
+    <div class="ab-kicker"><span>ABOUT THE SHOP</span><span>本店紹介</span></div>
+    <h2 class="ab-name" id="ab-title">昭和模型店<b>.</b></h2>
+    <div class="ab-sub">SHOWA MOKEI-TEN — <em>EST. 1973</em></div>
+    <div class="ab-text">
+      <p class="ab-lead">中央商店街のアーチをくぐって、三軒目。</p>
+      <p>昭和48年、神ノ町の商店街で創業した小さな模型とおもちゃの店です。ガンプラの新作から、駄菓子屋の軒先に吊るされていたカード玩具、ぜんまいで走るブリキまで。二代目店主が「子どものころの宝箱」を合言葉に、ひとつずつ仕入れています。</p>
+      <ol class="ab-points">
+        <li><span>01</span>半世紀ぶんのデッドストック棚</li>
+        <li><span>02</span>工具無料の組み立てコーナー</li>
+        <li><span>03</span>第2・第4土曜は塗装ワークショップ</li>
+      </ol>
+    </div>
+    <div class="ab-card">
+      <dl class="ab-info">
+        <dt>住所</dt><dd>〒150-0820 東京都神ノ町 3-12-7</dd>
+        <dt>営業</dt><dd>10:00 〜 19:00</dd>
+        <dt>定休</dt><dd>月曜日</dd>
+        <dt>電話</dt><dd>03-4444-XXXX</dd>
+      </dl>
+      <figure class="ab-map">
+        <button type="button" class="ab-zoom" id="mapBtn" aria-label="地図を拡大"><img src="shop-map.webp" alt="昭和模型店の外観と、神ノ町・中央商店街のイラスト地図" loading="lazy" width="1500" height="778"><span>拡大 ⤢</span></button>
+        <figcaption><b>MAP</b> 神ノ町・中央商店街 ／ 神ノ町駅から徒歩5分</figcaption>
+      </figure>
+    </div>
+  </div>
+</aside>
+<div id="lightbox" hidden><button type="button" class="lb-close" aria-label="閉じる">×</button><img src="shop-map.webp" alt="昭和模型店の外観と、神ノ町・中央商店街のイラスト地図"></div>
+
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* ======================================================================
+   0. 基本設定
+   ====================================================================== */
+THREE.ColorManagement.enabled = false;
+const $ = s => document.querySelector(s);
+const canvas = $('#gl');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' }); }
+catch (e) { $('#err').style.display = 'grid'; throw e; }
+renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+const LOW = matchMedia('(pointer: coarse)').matches || Math.min(screen.width, screen.height) < 600;   // 手機／平板：降低負載
+const DPR = Math.min(window.devicePixelRatio || 1, LOW ? 1.6 : 2);
+renderer.setPixelRatio(DPR);
+renderer.setClearColor(0x07080b, 1);
+
+(() => { // 標題逐字動畫
+  const t = $('#title'), em = t.querySelector('em'), txt = t.firstChild.textContent; t.firstChild.remove();
+  [...txt].forEach((ch, i) => { const s = document.createElement('span'); s.textContent = ch; s.style.setProperty('--i', i); t.insertBefore(s, em); });
+  Object.assign(em.style, { display: 'inline-block', animation: 'drop .8s cubic-bezier(.2,.9,.25,1.25) both', animationDelay: `${txt.length * 70 + 200}ms` });
+})();
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rand = mulberry32(743);
+const fr = x => x - Math.floor(x);
+const hash2 = (i, j) => fr(Math.sin(i * 127.1 + j * 311.7) * 43758.5453);
+const hash3 = (i, j, k) => fr(Math.sin(i * 127.1 + j * 311.7 + k * 74.7) * 43758.5453);
+const sm = t => t * t * (3 - 2 * t);
+function vnoise(x, y){
+  const i = Math.floor(x), j = Math.floor(y), u = sm(x - i), v = sm(y - j);
+  const a = hash2(i,j), b = hash2(i+1,j), c = hash2(i,j+1), d = hash2(i+1,j+1);
+  return (a + (b-a)*u + (c-a)*v + (a-b-c+d)*u*v) * 2 - 1;
+}
+function vnoise3(x, y, z){
+  const i = Math.floor(x), j = Math.floor(y), k = Math.floor(z), u = sm(x-i), v = sm(y-j), w = sm(z-k);
+  const L = (a, b, t) => a + (b - a) * t;
+  const x0 = L(L(hash3(i,j,k), hash3(i+1,j,k), u), L(hash3(i,j+1,k), hash3(i+1,j+1,k), u), v);
+  const x1 = L(L(hash3(i,j,k+1), hash3(i+1,j,k+1), u), L(hash3(i,j+1,k+1), hash3(i+1,j+1,k+1), u), v);
+  return L(x0, x1, w) * 2 - 1;
+}
+function fbm(x, y, o = 5){ let s = 0, a = .5, f = 1; for (let k = 0; k < o; k++){ s += a * vnoise(x*f, y*f); f *= 2.03; a *= .5; } return s; }
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t*t*(3-2*t); };
+
+/* ======================================================================
+   1. 共用 shader 片段：網點、排線、雜訊
+   ====================================================================== */
+const U = {
+  uLight: { value: new THREE.Vector3(-0.62, 0.5, 0.38).normalize() },   // 月面光源：左上偏後
+  uDot:   { value: Math.max(3.4, 4.2 * DPR) },
+  uTime:  { value: 0 },
+};
+const COMMON = /* glsl */`
+uniform vec3 uLight; uniform float uDot; uniform float uTime;
+vec2 rot2(vec2 p, float a){ float c = cos(a), s = sin(a); return vec2(c*p.x - s*p.y, s*p.x + c*p.y); }
+float halftone(float tone, float scale, float ang){
+  vec2 g = fract(rot2(gl_FragCoord.xy, ang) / scale) - 0.5;
+  float r = sqrt(clamp(tone, 0.0, 1.0)) * 0.74;
+  return (1.0 - smoothstep(r - 0.085, r + 0.085, length(g))) * smoothstep(0.0, 0.06, tone);
+}
+// 版畫排線：tone 越高線越粗
+float hatch(float tone, float scale, float ang){
+  float l = abs(fract(rot2(gl_FragCoord.xy, ang).y / scale) - 0.5) * 2.0;
+  return (1.0 - smoothstep(1.0 - tone - 0.12, 1.0 - tone + 0.12, l)) * smoothstep(0.05, 0.2, tone);
+}
+float hash12(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f);
+  return mix(mix(hash12(i), hash12(i + vec2(1,0)), u.x), mix(hash12(i + vec2(0,1)), hash12(i + vec2(1,1)), u.x), u.y); }
+`;
+const VERT = /* glsl */`
+varying vec3 vN; varying vec3 vW; varying vec3 vL;
+void main(){
+  vec4 lp = vec4(position, 1.0); vec3 n = normal;
+  #ifdef USE_INSTANCING
+    lp = instanceMatrix * lp; n = mat3(instanceMatrix) * n;
+  #endif
+  vec4 wp = modelMatrix * lp;
+  vW = wp.xyz; vL = position; vN = normalize(mat3(modelMatrix) * n);
+  gl_Position = projectionMatrix * viewMatrix * wp;
+}`;
+
+/* 描邊（反轉外殼，固定螢幕粗細）*/
+function makeOutline(thick){
+  return new THREE.ShaderMaterial({
+    uniforms: { uThick: { value: thick } }, side: THREE.BackSide,
+    vertexShader: /* glsl */`
+      uniform float uThick;
+      void main(){
+        vec4 lp = vec4(position, 1.0); vec3 n = normal;
+        #ifdef USE_INSTANCING
+          lp = instanceMatrix * lp; n = mat3(instanceMatrix) * n;
+        #endif
+        vec4 wp = modelMatrix * lp;
+        float d = length(cameraPosition - wp.xyz);
+        wp.xyz += normalize(mat3(modelMatrix) * n) * uThick * min(d, 80.0);
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }`,
+    fragmentShader: `void main(){ gl_FragColor = vec4(0.05, 0.055, 0.07, 1.0); }`,
+  });
+}
+function smoothNormals(src){
+  const g = src.index ? src.toNonIndexed() : src.clone();
+  const p = g.attributes.position, acc = new Map();
+  const key = i => `${Math.round(p.getX(i)*1e3)}_${Math.round(p.getY(i)*1e3)}_${Math.round(p.getZ(i)*1e3)}`;
+  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
+  for (let i = 0; i < p.count; i += 3){
+    a.fromBufferAttribute(p, i); b.fromBufferAttribute(p, i+1); c.fromBufferAttribute(p, i+2);
+    const n = b.clone().sub(a).cross(c.clone().sub(a));
+    for (let k = 0; k < 3; k++){ const kk = key(i+k); if (!acc.has(kk)) acc.set(kk, new THREE.Vector3()); acc.get(kk).add(n); }
+  }
+  const arr = new Float32Array(p.count * 3);
+  for (let i = 0; i < p.count; i++){ const n = acc.get(key(i)).clone().normalize(); arr.set([n.x, n.y, n.z], i*3); }
+  g.setAttribute('normal', new THREE.BufferAttribute(arr, 3));
+  return g;
+}
+
+/* ======================================================================
+   2. 相機（構圖對齊參考圖：地平線約 63%、地球佔畫面寬 80%）
+   ====================================================================== */
+const ASPECT = 743 / 1005;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(62, ASPECT, 0.1, 8000);
+const CAM = new THREE.Vector3(0, 1.5, 0);
+let PITCH = 8.9 * Math.PI / 180;
+
+/* ======================================================================
+   3. 地形：平坦月海 + 遠方雪白山脈
+   ====================================================================== */
+function heightAt(x, z){
+  const d = Math.hypot(x, z);
+  let h = fbm(x * .02, z * .02, 4) * .9 + fbm(x * .11 + 7, z * .11 - 3, 3) * .12;
+  h *= smooth(2, 40, d) * .9 + .1;
+  // 山脈：右側較高、左側低緩
+  const m = smooth(150, 230, -z);
+  const side = .72 + .28 * smooth(-160, 220, x);
+  const ridge = Math.pow(1 - Math.abs(vnoise(x * .016 + 3.1, z * .016)), 3.0);
+  const ridge2 = Math.pow(1 - Math.abs(vnoise(x * .045 - 2, z * .045 + 5)), 2.0);
+  h += m * side * (ridge * 21 + ridge2 * 6 + fbm(x * .03, z * .03, 4) * 4);
+  // 右側一道較近的稜線
+  h += smooth(120, 175, -z) * (1 - smooth(175, 215, -z)) * smooth(40, 150, x) * (Math.pow(ridge2, 1.5) * 9 + 2);
+  return h;
+}
+const terrain = (() => {
+  const NX = LOW ? 300 : 420, NZ = LOW ? 260 : 360;
+  const g = new THREE.PlaneGeometry(2, 1, NX, NZ); g.rotateX(-Math.PI / 2);
+  const p = g.attributes.position;
+  for (let i = 0; i < p.count; i++){
+    const u = p.getX(i), v = p.getZ(i) + .5;                 // u ∈ [-1,1]，v ∈ [0,1]（0 = 最遠）
+    const x = Math.sign(u) * Math.pow(Math.abs(u), 1.7) * 520;
+    const z = 12 - Math.pow(1 - v, 1.8) * 330;
+    p.setXYZ(i, x, heightAt(x, z), z);
+  }
+  g.computeVertexNormals();
+  const mat = new THREE.ShaderMaterial({
+    uniforms: Object.assign({}, U, {
+      uNear: { value: new THREE.Color(0xcfc5ad) }, uFar: { value: new THREE.Color(0xddd6c3) },
+      uShadeN: { value: new THREE.Color(0x1b222c) }, uShadeF: { value: new THREE.Color(0x6f7a87) },
+      uSnow: { value: new THREE.Color(0xf3eee2) }, uHaze: { value: new THREE.Color(0xe2ddd0) },
+    }),
+    vertexShader: VERT,
+    fragmentShader: COMMON + /* glsl */`
+      uniform vec3 uNear, uFar, uShadeN, uShadeF, uSnow, uHaze;
+      varying vec3 vN; varying vec3 vW; varying vec3 vL;
+      void main(){
+        vec3 N = normalize(vN);
+        float dist = length(cameraPosition - vW);
+        float far = smoothstep(12.0, 200.0, dist);
+        float ndl = dot(N, uLight);
+        float mtn = smoothstep(2.5, 9.0, vW.y);
+        float lit = smoothstep(0.08, 0.46, ndl);
+        vec3 base = mix(uNear, uFar, far);
+        // 山：迎光面是雪白
+        base = mix(base, uSnow, mtn * smoothstep(0.3, 0.7, ndl));
+        vec3 shade = mix(uShadeN, uShadeF, far);
+        // 近景：世界座標的砂粒與橫向刷紋
+        vec2 wp = vW.xz;
+        float grit = vnoise(wp * 7.0) * 0.55 + vnoise(wp * 19.0) * 0.45;
+        float streak = vnoise(vec2(wp.x * 0.45, wp.y * 5.5)) * 0.6 + vnoise(vec2(wp.x * 1.3, wp.y * 14.0)) * 0.4;
+        float nearF = 1.0 - smoothstep(10.0, 45.0, dist);
+        float speck = step(0.78, grit) * nearF * 0.9;
+        // 遠景：改用螢幕空間的印刷顆粒
+        float sp2 = step(0.9, hash12(floor(gl_FragCoord.xy / 1.6))) * step(0.45, vnoise(wp * 0.6)) * (1.0 - nearF) * (1.0 - mtn) * 0.7;
+        float tone = 1.0 - lit;
+        tone += smoothstep(0.55, 0.85, streak) * 0.22 * (1.0 - far * 0.6);
+        tone = clamp(tone, 0.0, 1.0);
+        float ink = halftone(tone, uDot, 0.7854);
+        ink = max(ink, hatch(smoothstep(0.55, 1.0, tone) * 0.6, uDot * 0.7, -0.5) * (1.0 - far));
+        vec3 col = mix(base, shade, ink);
+        col = mix(col, shade, max(speck, sp2) * 0.55);
+        // 遠方空氣感
+        col = mix(col, uHaze, smoothstep(60.0, 320.0, dist) * 0.42);
+        gl_FragColor = vec4(col, 1.0);
+      }`,
+  });
+  const m = new THREE.Mesh(g, mat); scene.add(m); return m;
+})();
+
+/* ======================================================================
+   4. 岩石：遠方碎石（大量 Instanced）+ 前景巨岩（高細節）+ 投影
+   ====================================================================== */
+function rockGeo(detail, seed, flat = .55){
+  const g = new THREE.IcosahedronGeometry(1, detail);
+  const p = g.attributes.position, v = new THREE.Vector3();
+  for (let i = 0; i < p.count; i++){
+    v.fromBufferAttribute(p, i);
+    const s = seed * 13.7;
+    let k = 1 + .32 * vnoise3(v.x*1.2 + s, v.y*1.2, v.z*1.2 - s) + .14 * vnoise3(v.x*2.9, v.y*2.9 + s, v.z*2.9) + .05 * vnoise3(v.x*7 - s, v.y*7, v.z*7);
+    // 稜角：用量化做出切面
+    k = k * .82 + Math.round(k * 4) / 4 * .18;
+    v.multiplyScalar(k); v.y *= flat;
+    if (v.y < -.18) v.y = -.18 + (v.y + .18) * .25;            // 平底，坐穩地面
+    p.setXYZ(i, v.x, v.y, v.z);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+function rockMat(){
+  return new THREE.ShaderMaterial({
+    uniforms: Object.assign({}, U, {
+      uBase: { value: new THREE.Color(0xe6ddc8) }, uShade: { value: new THREE.Color(0x182029) },
+      uFar: { value: new THREE.Color(0xddd6c3) },
+    }),
+    vertexShader: VERT,
+    fragmentShader: COMMON + /* glsl */`
+      uniform vec3 uBase, uShade, uFar;
+      varying vec3 vN; varying vec3 vW; varying vec3 vL;
+      void main(){
+        vec3 N = normalize(vN);
+        float ndl = dot(N, uLight);
+        float lit = smoothstep(-0.05, 0.55, ndl);
+        float tone = 1.0 - lit;
+        tone += (vnoise(vL.xz * 9.0 + vL.y * 5.0) - 0.5) * 0.18;          // 表面斑駁
+        tone = clamp(tone, 0.0, 1.0);
+        float ink = max(halftone(tone, uDot, 0.7854), hatch(smoothstep(0.45, 1.0, tone), uDot * 0.75, 0.6));
+        float dist = length(cameraPosition - vW);
+        vec3 shade = mix(uShade, vec3(0.42, 0.47, 0.53), smoothstep(20.0, 220.0, dist));
+        vec3 col = mix(mix(uBase, uFar, smoothstep(20.0, 200.0, dist)), shade, ink);
+        gl_FragColor = vec4(col, 1.0);
+      }`,
+  });
+}
+const shadowDir = new THREE.Vector2(-U.uLight.value.x, -U.uLight.value.z).normalize();
+const shadowMat = new THREE.ShaderMaterial({
+  uniforms: Object.assign({}, U, { uCol: { value: new THREE.Color(0x141a22) } }),
+  transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
+  vertexShader: `varying vec2 vUv; varying vec3 vW;
+    void main(){ vUv = uv; vec4 lp = vec4(position,1.0);
+      #ifdef USE_INSTANCING
+        lp = instanceMatrix * lp;
+      #endif
+      vec4 wp = modelMatrix * lp; vW = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }`,
+  fragmentShader: COMMON + /* glsl */`
+    uniform vec3 uCol; varying vec2 vUv; varying vec3 vW;
+    void main(){
+      vec2 q = vUv * 2.0 - 1.0;
+      float d = length(q);
+      float core = 1.0 - smoothstep(0.55, 0.8, d);
+      float soft = 1.0 - smoothstep(0.5, 1.0, d);
+      float a = max(core, halftone(soft * 0.85, uDot, 0.7854));
+      float far = smoothstep(25.0, 220.0, length(cameraPosition - vW));
+      if (a < 0.01) discard;
+      gl_FragColor = vec4(mix(uCol, vec3(0.42, 0.46, 0.5), far), a * mix(0.92, 0.55, far));
+    }`,
+});
+
+const rocks = [];
+// 前景巨岩（對照參考圖左下、右下）
+[[-1.6, -4.5, .9, 0], [-2.75, -6.3, .62, 1], [-.55, -4.05, .3, 2], [-3.7, -8.8, .55, 3], [2.5, -4.15, .55, 1],
+ [1.15, -3.85, .26, 2], [4.4, -11.5, .7, 0], [-5.2, -15.5, .95, 2], [7.5, -24, 1.05, 3], [-9.5, -30, 1.25, 1],
+ [-1.8, -11, .32, 3], [3.4, -17, .4, 0], [-6.8, -10.5, .45, 1], [10, -38, 1.4, 2], [-15, -48, 1.6, 0],
+ // 寬螢幕才看得到的兩側
+ [-6.2, -5.2, 1.0, 3], [-8.8, -7.5, .7, 0], [-12, -13, 1.3, 2], [-19, -22, 1.6, 1], [-28, -40, 2.2, 3],
+ [6.8, -5.0, .9, 2], [9.5, -8.5, .65, 3], [13, -14, 1.2, 0], [21, -26, 1.7, 1], [30, -44, 2.3, 2], [5.6, -3.6, .38, 1], [-4.8, -3.5, .42, 0]]
+  .forEach(r => rocks.push({ x: r[0], z: r[1], s: r[2], v: r[3], big: true }));
+// 平原上的碎石
+let guard = 0;
+while (rocks.length < (LOW ? 1300 : 2100) && guard++ < 30000){
+  const z = -4 - Math.pow(rand(), 0.9) * 260;
+  const x = (rand() * 2 - 1) * (Math.abs(z) * 1.25 + 7);
+  if (z > -8 && z < -3.5 && x > -1.3 && x < 3.4) continue;            // 讓出車子的位置
+  const s = (.05 + Math.pow(rand(), 3.4) * .5) * (1 + Math.abs(z) / 90);
+  rocks.push({ x, z, s, v: Math.floor(rand() * 4), big: false });
+}
+const m4 = new THREE.Matrix4(), q4 = new THREE.Quaternion(), e4 = new THREE.Euler();
+function rockMatrix(r){
+  e4.set((rand() - .5) * .25, rand() * 6.28, (rand() - .5) * .25); q4.setFromEuler(e4);
+  const sc = new THREE.Vector3(r.s * (1 + rand() * .45), r.s * (.75 + rand() * .4), r.s * (.85 + rand() * .4));
+  return m4.clone().compose(new THREE.Vector3(r.x, heightAt(r.x, r.z) - r.s * .1, r.z), q4, sc);
+}
+// 高細節岩石（4 種形狀）
+const bigGeos = [0, 1, 2, 3].map(i => rockGeo(3, i + 1, .58));
+const bigMat = rockMat(), bigOutline = makeOutline(.0021);
+bigGeos.forEach((g, gi) => {
+  const list = rocks.filter(r => r.big && r.v === gi); if (!list.length) return;
+  const im = new THREE.InstancedMesh(g, bigMat, list.length), om = new THREE.InstancedMesh(smoothNormals(g), bigOutline, list.length);
+  list.forEach((r, i) => { const m = rockMatrix(r); im.setMatrixAt(i, m); om.setMatrixAt(i, m); });
+  scene.add(im, om);
+});
+// 碎石（較低面數）
+{
+  const g = rockGeo(1, 7, .5), list = rocks.filter(r => !r.big);
+  const im = new THREE.InstancedMesh(g, rockMat(), list.length), om = new THREE.InstancedMesh(smoothNormals(g), makeOutline(.0015), list.length);
+  list.forEach((r, i) => { const m = rockMatrix(r); im.setMatrixAt(i, m); om.setMatrixAt(i, m); });
+  scene.add(im, om);
+}
+// 岩石投影
+const shadowGeo = new THREE.PlaneGeometry(1, 1); shadowGeo.rotateX(-Math.PI / 2);
+const shadows = new THREE.InstancedMesh(shadowGeo, shadowMat, rocks.length);
+const shAng = Math.atan2(shadowDir.x, shadowDir.y);
+rocks.forEach((r, i) => {
+  const len = r.s * 2.9, wid = r.s * 1.75;
+  const cx = r.x + shadowDir.x * r.s * .75, cz = r.z + shadowDir.y * r.s * .75;
+  q4.setFromAxisAngle(new THREE.Vector3(0, 1, 0), shAng);
+  shadows.setMatrixAt(i, m4.clone().compose(new THREE.Vector3(cx, heightAt(cx, cz) + .02, cz), q4, new THREE.Vector3(wid, 1, len)));
+});
+scene.add(shadows);
+
+/* ======================================================================
+   5. 地球：參考圖的「上半沒入黑暗、下半亮起的旋渦雲帶」
+   ====================================================================== */
+const NOISE3 = /* glsl */`
+vec3 mod289(vec3 x){return x - floor(x*(1.0/289.0))*289.0;}
+vec4 mod289(vec4 x){return x - floor(x*(1.0/289.0))*289.0;}
+vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314*r;}
+float snoise(vec3 v){
+  const vec2 C = vec2(1.0/6.0, 1.0/3.0); const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+  vec3 i = floor(v + dot(v, C.yyy)); vec3 x0 = v - i + dot(i, C.xxx);
+  vec3 g = step(x0.yzx, x0.xyz); vec3 l = 1.0 - g; vec3 i1 = min(g.xyz, l.zxy); vec3 i2 = max(g.xyz, l.zxy);
+  vec3 x1 = x0 - i1 + C.xxx; vec3 x2 = x0 - i2 + C.yyy; vec3 x3 = x0 - D.yyy;
+  i = mod289(i);
+  vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+  float n_ = 0.142857142857; vec3 ns = n_ * D.wyz - D.xzx;
+  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+  vec4 x_ = floor(j * ns.z); vec4 y_ = floor(j - 7.0 * x_);
+  vec4 x = x_ * ns.x + ns.yyyy; vec4 y = y_ * ns.x + ns.yyyy; vec4 h = 1.0 - abs(x) - abs(y);
+  vec4 b0 = vec4(x.xy, y.xy); vec4 b1 = vec4(x.zw, y.zw);
+  vec4 s0 = floor(b0)*2.0 + 1.0; vec4 s1 = floor(b1)*2.0 + 1.0; vec4 sh = -step(h, vec4(0.0));
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy; vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+  vec3 p0 = vec3(a0.xy, h.x); vec3 p1 = vec3(a0.zw, h.y); vec3 p2 = vec3(a1.xy, h.z); vec3 p3 = vec3(a1.zw, h.w);
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0); m = m*m;
+  return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+}
+vec3 rotAx(vec3 p, vec3 a, float t){ return p*cos(t) + cross(a, p)*sin(t) + a*dot(a, p)*(1.0 - cos(t)); }
+vec3 swirl(vec3 p, vec3 c, float k, float r){ float d = acos(clamp(dot(p, c), -1.0, 1.0)); return rotAx(p, c, k * exp(-d*d/(r*r))); }
+`;
+const E_DIST = 1100, E_ANG = 19.6 * Math.PI / 180, E_ELEV = 27.2 * Math.PI / 180;
+const E_R = E_DIST * Math.sin(E_ANG);
+const earthPos = CAM.clone().add(new THREE.Vector3(.012, Math.sin(E_ELEV), -Math.cos(E_ELEV)).normalize().multiplyScalar(E_DIST));
+const toCam = CAM.clone().sub(earthPos).normalize();
+// 地球光源：從觀者方向再往下壓，讓上緣落入夜面
+const uLe = { value: toCam.clone().applyAxisAngle(new THREE.Vector3(1, 0, 0), 0.8).applyAxisAngle(new THREE.Vector3(0, 1, 0), -0.12).normalize() };
+// 真實地球資料：R = 高程、G = 陸地遮罩、B = 衛星雲圖；day = 地表顏色（用來分出沙漠／植被）
+const texLoader = new THREE.TextureLoader();
+let loaded = 0; const ready = () => { if (++loaded >= 3) { earth.visible = atmo.visible = true; $('#veil').style.opacity = 0; } };
+const maxAniso = renderer.capabilities.getMaxAnisotropy();
+const loadTex = (url) => texLoader.load(url, t => { t.anisotropy = maxAniso; ready(); }, undefined, ready);
+const tBRC = loadTex('earth_brc.jpg'), tDay = loadTex('earth_day.jpg');
+const earth = new THREE.Mesh(new THREE.SphereGeometry(E_R, 256, 160), new THREE.ShaderMaterial({
+  uniforms: Object.assign({}, U, { uLe, tBRC: { value: tBRC }, tDay: { value: tDay }, uTex: { value: new THREE.Vector2(1 / 4096, 1 / 2048) } }),
+  vertexShader: `varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying vec3 vP;
+    void main(){ vUv = uv; vP = normalize(position); vec4 wp = modelMatrix * vec4(position,1.0); vW = wp.xyz; vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * viewMatrix * wp; }`,
+  fragmentShader: COMMON + NOISE3 + /* glsl */`
+    uniform vec3 uLe; uniform sampler2D tBRC; uniform sampler2D tDay; uniform vec2 uTex;
+    varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying vec3 vP;
+    void main(){
+      vec2 uv = vUv;
+      vec3 brc = texture2D(tBRC, uv).rgb;
+      float elev = brc.r;
+      float landM = smoothstep(0.35, 0.65, brc.g);
+      vec3 day = texture2D(tDay, uv).rgb;
+
+      // ---- 海：深藍，近岸稍亮（取周圍幾點陸地遮罩當距離）----
+      float coast = 0.0;
+      for (int i = 0; i < 8; i++){
+        float a = float(i) * 0.785;
+        coast += texture2D(tBRC, uv + vec2(cos(a), sin(a)) * uTex * 22.0).g;
+      }
+      coast = smoothstep(0.0, 3.0, coast) * (1.0 - landM);
+      vec3 ocean = mix(vec3(0.02, 0.07, 0.115), vec3(0.06, 0.19, 0.26), smoothstep(-0.6, 0.6, snoise(vP * 7.0)) * 0.6);
+      ocean = mix(ocean, vec3(0.12, 0.33, 0.4), coast * 0.65);
+
+      // ---- 陸：依地表顏色分沙漠（亮黃）與植被（深橙），再用高程做山影 ----
+      float lum = dot(day, vec3(0.3, 0.59, 0.11));
+      float desert = smoothstep(0.22, 0.5, lum + (day.r - day.g) * 1.2);
+      vec3 landC = mix(vec3(0.74, 0.38, 0.09), vec3(0.99, 0.79, 0.35), desert);
+      float ex = texture2D(tBRC, uv + vec2(uTex.x * 3.0, 0.0)).r, ey = texture2D(tBRC, uv + vec2(0.0, uTex.y * 3.0)).r;
+      float hill = clamp(0.5 + (elev - ex) * 18.0 - (elev - ey) * 18.0, 0.0, 1.0);
+      landC *= mix(0.6, 1.12, hill);
+      float speck = smoothstep(0.35, 0.5, snoise(vP * 140.0) * 0.6 + snoise(vP * 320.0) * 0.4);
+      landC = mix(landC, vec3(0.33, 0.18, 0.06), speck * (0.5 - desert * 0.3));
+      landC = mix(landC, vec3(0.93, 0.9, 0.84), smoothstep(0.55, 0.8, elev) * landM * step(abs(vP.y), 2.0) * smoothstep(0.75, 0.85, abs(vP.y)));   // 極地冰
+      vec3 col = mix(ocean, landC, landM);
+
+      // ---- 雲：衛星雲圖 + 細雜訊，切成三階硬邊，再刻等高線 ----
+      vec2 flow = vec2(snoise(vec3(uv * 9.0, uTime * 0.03)), snoise(vec3(uv * 9.0 + 4.0, uTime * 0.03))) * uTex * 5.0;
+      vec2 cuv = uv + vec2(uTime * 0.00025, 0.0) + flow;
+      float cl = texture2D(tBRC, cuv, 1.6).b;
+      float cd = cl + snoise(vP * 45.0) * 0.022 + snoise(vP * 130.0) * 0.01;
+      // 雲影投在地表
+      float shadowC = texture2D(tBRC, cuv + vec2(0.0015, -0.001), 2.0).b;
+      col *= 1.0 - smoothstep(0.35, 0.7, shadowC) * 0.35;
+      float thin  = smoothstep(0.17, 0.19, cd);
+      float mid   = smoothstep(0.30, 0.32, cd);
+      float thick = smoothstep(0.44, 0.46, cd);
+      vec3 cThin = mix(col, vec3(0.5, 0.62, 0.66), 0.62);
+      vec3 cMid  = vec3(0.86, 0.85, 0.78);
+      vec3 cThick = vec3(0.99, 0.95, 0.85);
+      col = mix(col, cThin, thin);
+      col = mix(col, cMid, mid);
+      col = mix(col, cThick, thick);
+      // 版畫刻線：沿雲的濃度等高線
+      float contour = 1.0 - smoothstep(0.0, 0.03, abs(fract(cd * 9.0) - 0.5) - 0.445);
+      col = mix(col, vec3(0.1, 0.2, 0.27), contour * thin * (1.0 - thick) * 0.7);
+      col = mix(col, vec3(0.42, 0.5, 0.52), contour * thick * 0.35);
+
+      // ---- 光照：網點晨昏線、上緣沒入黑暗 ----
+      vec3 N = normalize(vN);
+      float lit = smoothstep(-0.06, 0.34, dot(N, uLe));
+      col = mix(col, col * 0.1 + vec3(0.0, 0.008, 0.016), halftone(1.0 - lit, uDot * 0.9, 0.35));
+      float topDark = smoothstep(-0.44, 0.04, N.y);
+      col = mix(col, col * 0.08, halftone(topDark * 0.95, uDot * 0.9, 0.35));
+      vec3 V = normalize(cameraPosition - vW);
+      float mu = max(dot(N, V), 0.0);
+      col *= mix(0.7, 1.0, smoothstep(0.0, 0.3, mu));
+      col += vec3(0.12, 0.5, 0.95) * pow(1.0 - mu, 4.0) * smoothstep(-0.15, 0.45, dot(N, uLe)) * 1.8;
+      gl_FragColor = vec4(col, 1.0);
+    }`,
+}));
+earth.position.copy(earthPos);
+const EARTH_LON = 22 * Math.PI / 180;                     // 正對鏡頭的經度（南部非洲＋南大洋雲帶）
+earth.rotation.set(0.08, -Math.PI / 2 - EARTH_LON, 0.12);
+earth.visible = false; scene.add(earth);
+const atmo = new THREE.Mesh(new THREE.SphereGeometry(E_R * 1.025, 120, 80), new THREE.ShaderMaterial({
+  uniforms: { uLe }, side: THREE.BackSide, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  vertexShader: `varying vec3 vNV; varying vec3 vNW; void main(){ vNV = normalize(normalMatrix * normal); vNW = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+  fragmentShader: `uniform vec3 uLe; varying vec3 vNV; varying vec3 vNW;
+    void main(){ float i = pow(clamp(0.66 - dot(vNV, vec3(0.0,0.0,1.0)), 0.0, 1.0), 5.0) * 7.0;
+      i *= smoothstep(-0.25, 0.5, dot(-vNW, uLe));
+      gl_FragColor = vec4(vec3(0.16, 0.52, 0.98) * i, 1.0); }`,
+}));
+atmo.visible = false; atmo.position.copy(earthPos); scene.add(atmo);
+
+/* ---------- 星空 ---------- */
+{
+  const n = 8000, pos = new Float32Array(n*3), sz = new Float32Array(n), ph = new Float32Array(n);
+  for (let i = 0; i < n; i++){
+    const th = (rand() - .5) * 3.4, y = .02 + rand() * .9, r = Math.sqrt(1 - y*y);
+    pos.set([Math.sin(th)*r*3000, y*3000, -Math.cos(th)*r*3000], i*3);
+    sz[i] = Math.pow(rand(), 7) * 2.6 + .7; ph[i] = rand() * 6.28;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('aS', new THREE.BufferAttribute(sz, 1)); g.setAttribute('aP', new THREE.BufferAttribute(ph, 1));
+  scene.add(new THREE.Points(g, new THREE.ShaderMaterial({
+    uniforms: { uTime: U.uTime, uDPR: { value: DPR } }, transparent: true, depthWrite: false,
+    vertexShader: `attribute float aS; attribute float aP; uniform float uTime; uniform float uDPR; varying float vA;
+      void main(){ vA = 0.6 + 0.4 * sin(uTime * (0.7 + aP * 0.3) + aP * 10.0); gl_PointSize = aS * uDPR; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `varying float vA; void main(){ if (length(gl_PointCoord - 0.5) > 0.5) discard; gl_FragColor = vec4(vec3(0.95, 0.93, 0.86) * vA, 1.0); }`,
+  })));
+}
+/* ---------- 飄浮月塵 ---------- */
+{
+  const n = 260, pos = new Float32Array(n*3), sd = new Float32Array(n);
+  for (let i = 0; i < n; i++){ pos.set([(rand()-.5)*16, rand()*3.2, -3 - rand()*22], i*3); sd[i] = rand(); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('aS', new THREE.BufferAttribute(sd, 1));
+  scene.add(new THREE.Points(g, new THREE.ShaderMaterial({
+    uniforms: { uTime: U.uTime, uDPR: { value: DPR } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `attribute float aS; uniform float uTime; uniform float uDPR; varying float vA;
+      void main(){ vec3 p = position; p.x = mod(p.x + uTime * 0.12 * (0.3 + aS) + 8.0, 16.0) - 8.0; p.y += sin(uTime * 0.3 + aS * 30.0) * 0.15;
+        vec4 mv = modelViewMatrix * vec4(p, 1.0); vA = 0.18 + 0.3 * aS; gl_PointSize = (1.2 + aS * 2.0) * uDPR * (6.0 / -mv.z); gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `varying float vA; void main(){ if (length(gl_PointCoord - 0.5) > 0.5) discard; gl_FragColor = vec4(vec3(0.95, 0.9, 0.78) * vA, 1.0); }`,
+  })));
+}
+
+/* ======================================================================
+   6. 車子：使用者提供的去背圖，當成 2D 立牌站在 3D 月面上
+   ====================================================================== */
+const CAR_IMG_ASPECT = 740 / 417, CAR_BOTTOM_PAD = 6 / 417;
+const CAR_POSTER = { cx: .615, bottom: .885, width: .79 };      // 海報構圖：在 743:1005 安全框中的位置（比例）
+const CAR_PHONE  = { cx: .5,   bottom: .84,  width: .9 };      // 手機直式：車子置中、完整露出
+const CAR_SCREEN = { ...CAR_POSTER };
+const carCard = new THREE.Group(); scene.add(carCard);
+const carShadow = new THREE.Mesh(shadowGeo, shadowMat.clone());
+carShadow.material.uniforms = Object.assign({}, shadowMat.uniforms, { uCol: { value: new THREE.Color(0x10141a) } });
+scene.add(carShadow);
+let carMesh = null;
+const SAFE = { w: 1, h: 1 }, VIEW = { w: 1, h: 1 };
+function placeCar(){
+  // 依構圖反推：從相機打一條射線到地面，找出車輪著地點
+  camera.position.copy(CAM); camera.rotation.set(PITCH, 0, 0, 'YXZ'); camera.updateMatrixWorld();
+  const fx = SAFE.w / VIEW.w, fy = SAFE.h / VIEW.h;
+  const ndc = new THREE.Vector3((CAR_SCREEN.cx * 2 - 1) * fx, (1 - CAR_SCREEN.bottom * 2) * fy, .5).unproject(camera);
+  const dir = ndc.sub(CAM).normalize();
+  const t = -CAM.y / dir.y, hit = CAM.clone().addScaledVector(dir, t);
+  const depth = -hit.z;
+  const halfW = depth * Math.tan(camera.fov * Math.PI / 360) * camera.aspect * fx;
+  const w = CAR_SCREEN.width * 2 * halfW, h = w / CAR_IMG_ASPECT;
+  carCard.position.set(hit.x, -h * CAR_BOTTOM_PAD, hit.z);
+  carCard.userData = { w, h };
+  if (carMesh) carMesh.scale.set(w, h, 1);
+  const fwd = new THREE.Vector2(-.56, -.83).normalize();
+  const c = new THREE.Vector2(hit.x, hit.z).addScaledVector(fwd, w * .2).addScaledVector(shadowDir, w * .07);
+  carShadow.position.set(c.x, .03, c.y);
+  carShadow.rotation.y = Math.atan2(fwd.x, fwd.y);
+  carShadow.scale.set(w * .5, 1, w * .92);
+}
+texLoader.load('car.png', tex => {
+  tex.anisotropy = maxAniso; tex.minFilter = THREE.LinearMipmapLinearFilter;
+  carMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).translate(0, .5, 0), new THREE.ShaderMaterial({
+    uniforms: Object.assign({}, U, { map: { value: tex } }), transparent: true,
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: COMMON + `uniform sampler2D map; varying vec2 vUv;
+      void main(){
+        vec4 c = texture2D(map, vUv);
+        if (c.a < 0.04) discard;
+        float lum = dot(c.rgb, vec3(0.3, 0.59, 0.11));
+        float ink = halftone(smoothstep(0.55, 0.12, lum) * 0.5, uDot, 0.7854);
+        c.rgb = mix(c.rgb, c.rgb * 0.55, ink * 0.35);
+        gl_FragColor = vec4(c.rgb, c.a);
+      }`,
+  }));
+  carMesh.renderOrder = 2;
+  carMesh.scale.set(carCard.userData.w, carCard.userData.h, 1);
+  carCard.add(carMesh);
+  ready();
+}, undefined, ready);
+
+/* ======================================================================
+   6b. 太空站：使用者提供的去背圖，掛在地球右側的前方（比地球近，會有視差）
+   ====================================================================== */
+const SAT_POS = {                                                   // 中心點與寬度，皆為安全框比例
+  poster: { x: .855, y: .35, w: .13 },
+  phone:  { x: .83, y: .41, w: .18 },
+};
+const SAT_DIST = 380;                                               // 離相機的距離（地球在 1100）
+const satAnchor = new THREE.Vector3(), satNow = { x: .79, y: .315, w: .25 };
+let satMesh = null, satAspect = 1300 / 656, satSize = 1;
+function placeSat(){
+  camera.position.copy(CAM); camera.rotation.set(PITCH, 0, 0, 'YXZ'); camera.updateMatrixWorld();
+  const fx = SAFE.w / VIEW.w, fy = SAFE.h / VIEW.h;
+  const p = new THREE.Vector3((satNow.x * 2 - 1) * fx, (1 - satNow.y * 2) * fy, .5).unproject(camera);
+  const dir = p.sub(CAM).normalize();
+  satAnchor.copy(CAM).addScaledVector(dir, SAT_DIST);
+  const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+  const depth = satAnchor.clone().sub(CAM).dot(fwd);
+  satSize = satNow.w * 2 * depth * Math.tan(camera.fov * Math.PI / 360) * camera.aspect * fx;
+  if (satMesh) satMesh.scale.set(satSize, satSize / satAspect, 1);
+}
+texLoader.load('satellite.webp', tex => {
+  tex.anisotropy = maxAniso; tex.minFilter = THREE.LinearMipmapLinearFilter;
+  satAspect = tex.image.width / tex.image.height;
+  satMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.ShaderMaterial({
+    uniforms: Object.assign({}, U, { map: { value: tex } }), transparent: true, depthWrite: false,
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: COMMON + `uniform sampler2D map; varying vec2 vUv;
+      void main(){
+        vec4 c = texture2D(map, vUv);
+        if (c.a < 0.03) discard;
+        float lum = dot(c.rgb, vec3(0.3, 0.59, 0.11));
+        float ink = halftone(smoothstep(0.55, 0.1, lum) * 0.5, uDot * 0.8, 0.7854);
+        c.rgb = mix(c.rgb, c.rgb * 0.55, ink * 0.3);
+        gl_FragColor = vec4(c.rgb, c.a);
+      }`,
+  }));
+  satMesh.renderOrder = 3;
+  satMesh.scale.set(satSize, satSize / satAspect, 1);
+  scene.add(satMesh);
+});
+setTimeout(() => $('#veil').style.opacity = 0, 4000);
+
+/* ======================================================================
+   7. 後製：錯版、顆粒、暗角
+   ====================================================================== */
+const rt = new THREE.WebGLRenderTarget(2, 2, { samples: LOW ? 2 : 4 });
+const postScene = new THREE.Scene(), postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+const postMat = new THREE.ShaderMaterial({
+  uniforms: { tDiffuse: { value: rt.texture }, uRes: { value: new THREE.Vector2(1, 1) }, uTime: U.uTime },
+  vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+  fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 uRes; uniform float uTime; varying vec2 vUv;
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+    void main(){
+      vec2 off = vec2(1.4 / uRes.x, 0.5 / uRes.y);
+      vec3 c = texture2D(tDiffuse, vUv).rgb;
+      c.r = mix(c.r, texture2D(tDiffuse, vUv + off).r, 0.6);
+      c.b = mix(c.b, texture2D(tDiffuse, vUv - off).b, 0.4);
+      c += (hash(floor(gl_FragCoord.xy) + floor(uTime * 12.0) * 7.31) - 0.5) * 0.05;
+      c = max(c, vec3(0.027, 0.03, 0.038) + hash(floor(gl_FragCoord.xy / 3.0) * 1.7) * 0.02);
+      vec2 q = vUv - 0.5; c *= 1.0 - dot(q, q) * 0.75;
+      gl_FragColor = vec4(c, 1.0);
+    }`,
+  depthTest: false, depthWrite: false,
+});
+postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMat));
+
+/* ======================================================================
+   8. 互動：滑鼠視差、拖曳微轉（幅度小，維持海報構圖）
+   ====================================================================== */
+const st = { mx: 0, my: 0, sx: 0, sy: 0, yaw: 0, yawT: 0, pit: 0, pitT: 0 };
+let drag = false, lx = 0, ly = 0;
+canvas.addEventListener('pointerdown', e => { drag = true; lx = e.clientX; ly = e.clientY; canvas.classList.add('drag'); canvas.setPointerCapture(e.pointerId); });
+const end = e => { drag = false; canvas.classList.remove('drag'); st.yawT = 0; st.pitT = 0; if (e && e.pointerType !== 'mouse') { st.mx = 0; st.my = 0; } };
+canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end);
+addEventListener('pointermove', e => {
+  st.mx = e.clientX / innerWidth * 2 - 1; st.my = e.clientY / innerHeight * 2 - 1;
+  if (!drag) return;
+  st.yawT = Math.max(-.14, Math.min(.14, st.yawT - (e.clientX - lx) * .0012));
+  st.pitT = Math.max(-.05, Math.min(.06, st.pitT + (e.clientY - ly) * .0006));
+  lx = e.clientX; ly = e.clientY;
+});
+
+const stageEl = $('#stage'), root = document.documentElement;
+function resize(){
+  // 版面模式：左側留白夠寬 → 本店紹介放左側（side）；否則放到第一屏下方（stack）
+  const vw = innerWidth, vh = innerHeight;
+  const side = vw / vh >= ASPECT && (vw - vh * ASPECT) / 2 >= 300 && vh >= 600;
+  root.classList.toggle('side', side); root.classList.toggle('stack', !side);
+  const w = Math.max(1, stageEl.clientWidth), h = Math.max(1, stageEl.clientHeight);
+  VIEW.w = w; VIEW.h = h;
+  const a = w / h;
+  camera.aspect = a;
+  if (a >= ASPECT){
+    // 比海報寬：垂直視角固定，左右自然延伸
+    SAFE.w = h * ASPECT; SAFE.h = h;
+    camera.fov = 62; PITCH = 8.9 * Math.PI / 180;
+    Object.assign(CAR_SCREEN, CAR_POSTER);
+  } else {
+    // 比海報窄（手機）：以整個螢幕為構圖框，視角拉高讓地球放大、車子置中
+    SAFE.w = w; SAFE.h = h;
+    const m = smooth(.46, ASPECT, a);                     // 0 = 細長手機，1 = 海報比例
+    camera.fov = 80 + (62 - 80) * m;
+    PITCH = (8.4 + (8.9 - 8.4) * m) * Math.PI / 180;
+    for (const k of ['cx', 'bottom', 'width']) CAR_SCREEN[k] = CAR_PHONE[k] + (CAR_POSTER[k] - CAR_PHONE[k]) * m;
+  }
+  camera.updateProjectionMatrix();
+  document.documentElement.classList.toggle('phone', a < ASPECT);
+  document.documentElement.style.setProperty('--safe-w', SAFE.w + 'px');
+  document.documentElement.style.setProperty('--safe-l', ((w - SAFE.w) / 2) + 'px');
+  placeCar();
+  Object.assign(satNow, a >= ASPECT ? SAT_POS.poster : (() => { const m = smooth(.46, ASPECT, a), o = {}; for (const k of ['x', 'y', 'w']) o[k] = SAT_POS.phone[k] + (SAT_POS.poster[k] - SAT_POS.phone[k]) * m; return o; })());
+  placeSat();
+  renderer.setSize(w, h, false);
+  rt.setSize(Math.floor(w * DPR), Math.floor(h * DPR));
+  postMat.uniforms.uRes.value.set(w * DPR, h * DPR);
+}
+addEventListener('resize', resize); resize();
+
+// 捲動：導覽列加底色；第一屏離開畫面時暫停渲染
+const topnav = $('#topnav');
+addEventListener('scroll', () => topnav.classList.toggle('scrolled', scrollY > 24), { passive: true });
+let stageVisible = true;
+new IntersectionObserver(([e]) => { stageVisible = e.isIntersecting; }).observe(stageEl);
+// 地圖燈箱
+const lightbox = $('#lightbox');
+const openLB = () => { lightbox.hidden = false; lightbox.querySelector('.lb-close').focus(); };
+const closeLB = () => { lightbox.hidden = true; $('#mapBtn').focus({ preventScroll: true }); };
+$('#mapBtn').addEventListener('click', openLB);
+lightbox.addEventListener('click', closeLB);
+addEventListener('keydown', e => { if (e.key === 'Escape' && !lightbox.hidden) closeLB(); });
+
+const clock = new THREE.Clock(), head = $('#head');
+function frame(){
+  const dt = Math.min(clock.getDelta(), .05), t = clock.elapsedTime;
+  U.uTime.value = t;
+  const k = 1 - Math.exp(-dt * 3);
+  st.sx += (st.mx - st.sx) * k; st.sy += (st.my - st.sy) * k;
+  st.yaw += (st.yawT - st.yaw) * (1 - Math.exp(-dt * (drag ? 8 : 2)));
+  st.pit += (st.pitT - st.pit) * (1 - Math.exp(-dt * (drag ? 8 : 2)));
+  // 相機在原位附近微動，車立牌永遠面向相機
+  camera.position.set(CAM.x + st.sx * .32 + Math.sin(t * .23) * .04, CAM.y - st.sy * .12 + Math.sin(t * .31) * .02, CAM.z);
+  camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), st.yaw * .6);
+  camera.rotation.set(PITCH + st.pit - st.sy * .006, st.yaw - st.sx * .012, 0, 'YXZ');
+  if (satMesh){                                                      // 太空站：面向鏡頭、緩慢漂移與微微翻滾
+    satMesh.position.copy(satAnchor).add(new THREE.Vector3(Math.sin(t * .05) * satSize * .12, Math.sin(t * .09 + 1) * satSize * .05, 0));
+    satMesh.quaternion.copy(camera.quaternion);
+    satMesh.rotateZ(Math.sin(t * .07) * .035);
+    updateLock();
+  }
+  carCard.rotation.y = Math.atan2(camera.position.x - carCard.position.x, camera.position.z - carCard.position.z);
+  earth.rotation.y = -Math.PI / 2 - EARTH_LON + t * .0012;
+  head.style.transform = `translate(${(-st.sx * 6).toFixed(2)}px, ${(-st.sy * 4).toFixed(2)}px)`;
+
+  if (!stageVisible) { requestAnimationFrame(frame); return; }
+  renderer.setRenderTarget(rt); renderer.render(scene, camera);
+  renderer.setRenderTarget(null); renderer.render(postScene, postCam);
+  requestAnimationFrame(frame);
+}
+/* ---------- 衛星鎖定框 → 本店紹介 ---------- */
+const lockEl = $('#lock'), aboutEl = $('#about'), tether = $('#tether'), tPath = tether.querySelector('path'), tDot = tether.querySelector('circle');
+const hoverMQ = matchMedia('(hover: hover) and (pointer: fine)');
+const syncHover = () => root.classList.toggle('hoverable', hoverMQ.matches);
+syncHover(); hoverMQ.addEventListener?.('change', syncHover);
+const _c = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+function updateLock(){
+  if (!root.classList.contains('hoverable')) return;
+  camera.updateMatrixWorld(); satMesh.updateMatrixWorld();
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  [[-.5, -.5], [.5, -.5], [.5, .5], [-.5, .5]].forEach(([x, y], i) => {
+    const v = _c[i].set(x, y, 0).applyMatrix4(satMesh.matrixWorld).project(camera);
+    const sx = (v.x + 1) / 2 * VIEW.w, sy = (1 - v.y) / 2 * VIEW.h;
+    x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
+  });
+  const pad = 12, w = x1 - x0 + pad * 2, h = (y1 - y0) * .78 + pad * 2;   // 圖片上下有留白，框收緊一點
+  const lx = x0 - pad, ly = (y0 + y1) / 2 - h / 2;
+  lockEl.style.transform = `translate(${lx.toFixed(1)}px, ${ly.toFixed(1)}px)`;
+  lockEl.style.width = `${w.toFixed(1)}px`; lockEl.style.height = `${h.toFixed(1)}px`;
+  // 側邊欄打開時，從面板邊緣拉一條虛線連到目標
+  if (aboutOpen && root.classList.contains('side')){
+    const ax = aboutEl.getBoundingClientRect().right + 6, cy = ly + h / 2, ex = lx - 10;
+    tPath.setAttribute('d', `M${ax.toFixed(1)},${(cy + 26).toFixed(1)} L${(ax + 28).toFixed(1)},${cy.toFixed(1)} L${ex.toFixed(1)},${cy.toFixed(1)}`);
+    tDot.setAttribute('cx', ex.toFixed(1)); tDot.setAttribute('cy', cy.toFixed(1));
+  }
+}
+let aboutOpen = false;
+function setAbout(open){
+  aboutOpen = open;
+  root.classList.toggle('about-open', open);
+  lockEl.setAttribute('aria-expanded', open);
+  lockEl.setAttribute('aria-label', open ? '本店紹介を閉じる' : '本店紹介を開く');
+  if (open) setTimeout(() => $('#abClose').focus({ preventScroll: true }), 300);
+}
+lockEl.addEventListener('click', () => {
+  if (root.classList.contains('side')) setAbout(!aboutOpen);
+  else aboutEl.scrollIntoView({ behavior: 'smooth', block: 'start' });      // 窄螢幕：捲到下方的本店紹介
+});
+$('#abClose').addEventListener('click', () => { setAbout(false); lockEl.focus({ preventScroll: true }); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && aboutOpen && lightbox.hidden && !menuOpen){ setAbout(false); lockEl.focus({ preventScroll: true }); } });
+addEventListener('resize', () => { if (!root.classList.contains('side') && aboutOpen) setAbout(false); });
+
+/* ---------- 漢堡選單 ---------- */
+const menuBtn = $('#menuBtn'), menu = $('#menu');
+let menuOpen = false;
+function setMenu(open){
+  menuOpen = open;
+  if (open && aboutOpen) setAbout(false);
+  document.documentElement.classList.toggle('menu-open', open);
+  menuBtn.setAttribute('aria-expanded', open);
+  menuBtn.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+  menu.setAttribute('aria-hidden', !open);
+  if (open) setTimeout(() => menu.querySelector('.m-list a')?.focus({ preventScroll: true }), 420);
+  else menuBtn.focus({ preventScroll: true });
+}
+menuBtn.addEventListener('click', () => setMenu(!menuOpen));
+menu.addEventListener('click', e => { if (e.target.closest('[data-close]') || e.target.closest('a')) setMenu(false); });
+addEventListener('keydown', e => {
+  if (e.key === 'Escape' && menuOpen) setMenu(false);
+  if (e.key === 'Tab' && menuOpen){                                  // 焦點留在選單內
+    const f = [menuBtn, ...menu.querySelectorAll('a')], i = f.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0){ e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && i === f.length - 1){ e.preventDefault(); f[0].focus(); }
+  }
+});
+
+frame();
+</script>
+</body>
+</html>
