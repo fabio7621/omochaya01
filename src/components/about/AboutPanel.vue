@@ -96,8 +96,11 @@ html.side .ab-close:hover,html.side .ab-close:focus-visible{background:var(--yel
 /* 窄螢幕／手機（stack）：變成第一屏下方的 footer */
 html.stack #about{padding:72px 6vw 88px;background:radial-gradient(rgba(239,228,203,.05) 1px, transparent 1.4px) 0 0/6px 6px, #0a0b0e;
   border-top:3px solid var(--cream);box-shadow:inset 0 5px 0 #0a0b0e, inset 0 6px 0 var(--cream)}
-html.stack .ab-inner{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:1fr 1.05fr;gap:0 52px;align-items:start}
-html.stack .ab-kicker,html.stack .ab-name,html.stack .ab-sub{grid-column:1 / -1}
+/* 文字與紙卡用 flex-wrap：寬度夠才並排，不夠（約 810px 以下）自動疊成一欄 */
+html.stack .ab-inner{max-width:1040px;margin:0 auto;display:flex;flex-wrap:wrap;gap:0 52px;align-items:flex-start}
+html.stack .ab-kicker,html.stack .ab-name,html.stack .ab-sub{flex:0 0 100%}
+html.stack .ab-text{flex:1 1 320px;min-width:0}
+html.stack .ab-card{flex:1.05 1 340px;min-width:0}
 html.stack .ab-card{margin-top:1.4em}
 html.phone #about{padding:56px 5.5vw calc(64px + env(safe-area-inset-bottom));font-size:15px}
 html.phone .ab-inner{display:block}
