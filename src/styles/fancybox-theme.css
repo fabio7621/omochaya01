@@ -1,0 +1,32 @@
+/* 地圖燈箱（Fancybox）換成本站風格：網點黑底、米色框＋紅色錯位陰影、黃色斜體按鈕。
+   Fancybox 容器掛在 <body> 下，所以這份樣式必須是全域的，用 .map-lightbox 限定範圍。 */
+.fancybox__container.map-lightbox{
+  --fancybox-backdrop-bg:rgba(7,8,11,.88);
+  /* 上方讓出工具列（14px + 46px 按鈕），左右留白讓米色框與紅色陰影不被切掉 */
+  --f-carousel-slide-padding:72px max(20px, 4vw) 8px;
+  --f-button-bg:transparent;
+  --f-button-color:var(--yellow);
+  --f-button-hover-color:#0a0b0e;
+  --f-button-hover-bg:var(--yellow);
+  --f-button-active-bg:var(--yellow);
+  --f-button-border:1.5px solid var(--yellow);
+  --f-button-outline-color:var(--red);
+  --f-button-svg-stroke-width:2.2;
+  --f-toolbar-padding:14px 18px;
+  --f-toolbar-gap:8px;
+  --f-toolbar-color:var(--cream);
+  --f-toolbar-font:italic 700 13px "Chakra Petch",sans-serif;
+  --f-toolbar-text-shadow:none;
+  --f-caption-color:var(--cream);
+  --f-caption-padding:18px 12px 22px;
+  --f-spinner-color-1:rgba(239,228,203,.2);
+  --f-spinner-color-2:var(--yellow);
+}
+.map-lightbox .fancybox__backdrop{
+  background:radial-gradient(rgba(10,11,14,.6) 1.1px, transparent 1.5px) 0 0/5px 5px, rgba(7,8,11,.88);
+}
+/* 外框用 box-shadow 疊出來，不動到 Fancybox 計算尺寸用的 border */
+.map-lightbox .f-panzoom__content{box-shadow:0 0 0 3px var(--cream), 8px 8px 0 3px var(--red)}
+.map-lightbox .f-button{transform:skewX(-10deg)}
+.map-lightbox .f-caption{font:700 13px/1.6 "Zen Kaku Gothic New",sans-serif;letter-spacing:.05em;text-align:center}
+.map-lightbox .f-caption b{font:italic 700 1em "Chakra Petch",sans-serif;color:var(--red);margin-right:.6em;letter-spacing:.14em}

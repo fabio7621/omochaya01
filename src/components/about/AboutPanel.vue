@@ -5,6 +5,10 @@ import shopMapUrl from '@/assets/images/shop-map.webp';
 
 const { els, closeAbout, openLightbox } = useUi();
 const pad2 = n => String(n).padStart(2, '0');
+
+function openMap(e) {
+  openLightbox({ src: shopMapUrl, alt: shop.map.alt, caption: `<b>MAP</b>${shop.map.caption}`, triggerEl: e.currentTarget });
+}
 </script>
 
 <template>
@@ -26,7 +30,7 @@ const pad2 = n => String(n).padStart(2, '0');
           <template v-for="row in shop.info" :key="row.label"><dt>{{ row.label }}</dt><dd>{{ row.value }}</dd></template>
         </dl>
         <figure class="ab-map">
-          <button :ref="el => (els.mapBtn = el)" type="button" class="ab-zoom" aria-label="地図を拡大" @click="openLightbox">
+          <button type="button" class="ab-zoom" aria-label="地図を拡大" @click="openMap">
             <img :src="shopMapUrl" :alt="shop.map.alt" loading="lazy" width="1500" height="778"><span>拡大 ⤢</span>
           </button>
           <figcaption><b>MAP</b> {{ shop.map.caption }}</figcaption>

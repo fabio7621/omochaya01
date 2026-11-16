@@ -3,12 +3,13 @@ import { useUi } from './useUi.js';
 
 // 全域鍵盤操作：Esc 一次只關最上層；選單開啟時把 Tab 焦點留在選單內
 export function useGlobalKeys() {
-  const { menuOpen, aboutOpen, lightboxOpen, els, setMenu, closeAbout, closeLightbox } = useUi();
+  const { menuOpen, aboutOpen, lightboxOpen, els, setMenu, closeAbout } = useUi();
 
   function onKeydown(e) {
+    // 地圖燈箱（Fancybox）開著時，鍵盤全部交給它
+    if (lightboxOpen.value) return;
     if (e.key === 'Escape') {
-      if (lightboxOpen.value) closeLightbox();
-      else if (menuOpen.value) setMenu(false);
+      if (menuOpen.value) setMenu(false);
       else if (aboutOpen.value) closeAbout();
       return;
     }

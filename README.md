@@ -28,14 +28,14 @@ src/
     shop.js                  本店紹介、營業資訊
   composables/             跨元件的狀態與行為
     useLayout.js             side / stack / phone / hoverable 版面模式
-    useUi.js                 選單、本店紹介抽屜、地圖燈箱的開關與焦點
+    useUi.js                 選單、本店紹介抽屜的開關與焦點；地圖燈箱（Fancybox）
     useGlobalKeys.js         Esc 關閉、選單內 Tab 焦點循環
   components/
     layout/                  TopNav.vue、MenuButton.vue
     stage/                   MoonStage.vue（畫布與場景生命週期）、HeroTitle.vue、
                              SatelliteLock.vue、ScrollHint.vue
     menu/                    CategoryMenu.vue
-    about/                   AboutPanel.vue、MapLightbox.vue
+    about/                   AboutPanel.vue
   three/                   3D 場景（純 JS，不依賴 Vue）
     createMoonScene.js       組裝場景、resize、每幀更新；對外只有這一個入口
     core/                    setup（renderer、共用 uniform）、view（相機與構圖）、
@@ -43,6 +43,7 @@ src/
     materials/               outline（描邊）、shadow（地面投影）
     objects/                 terrain、rocks、earth、sky（星空與月塵）、car、satellite
     shaders/                 各物件的 GLSL 字串
+  styles/                  base.css、fancybox-theme.css（燈箱換成本站風格）
   assets/
     textures/                car.png、satellite.webp、earth_brc.jpg、earth_day.jpg
     images/                  shop-map.webp
