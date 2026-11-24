@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import MenuButton from './MenuButton.vue';
+import SoundToggle from './SoundToggle.vue';
 import { site } from '@/data/site.js';
 
 // 捲動後替導覽列加上底色
@@ -16,6 +17,7 @@ onBeforeUnmount(() => removeEventListener('scroll', onScroll));
       <div class="brand">
         <MenuButton />
         <div class="logo">{{ site.logo[0] }}<b>·</b>{{ site.logo[1] }}</div>
+        <SoundToggle />
       </div>
       <div class="issue">{{ site.issue }}</div>
     </div>
